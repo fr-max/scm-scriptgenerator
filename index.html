@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Supply Chain Moments — Scriptgenerator</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e0e;
+    --surface: #161616;
+    --surface2: #1f1f1f;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #f0ede8;
+    --muted: #888;
+    --hint: #555;
+    --accent: #d4f57a;
+    --accent-dim: #b8d966;
+    --danger: #e05a5a;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .layout {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 3rem 2rem 6rem;
+  }
+
+  /* Header */
+  .top-bar {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 3rem;
+    gap: 1rem;
+  }
+
+  .wordmark {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .wordmark strong {
+    display: block;
+    color: var(--accent);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .ep-count {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--hint);
+    text-align: right;
+    padding-top: 2px;
+  }
+
+  /* API key section */
+  .api-section {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .api-section label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .api-section input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .api-section input::placeholder { color: var(--hint); }
+
+  .api-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--hint);
+    flex-shrink: 0;
+    transition: background 0.3s;
+  }
+  .api-dot.ok { background: var(--accent); }
+
+  /* Form */
+  .form-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+  }
+
+  .situation-wrap {
+    margin-bottom: 1.5rem;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 15px;
+    line-height: 1.6;
+    padding: 14px 16px;
+    resize: vertical;
+    min-height: 96px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: var(--border2); }
+  textarea::placeholder { color: var(--hint); }
+
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 1.5rem;
+  }
+
+  .field { display: flex; flex-direction: column; }
+
+  select, input[type="text"] {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+    padding: 10px 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23555' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; cursor: pointer; }
+  select:focus, input[type="text"]:focus { border-color: var(--border2); }
+  select option { background: #1f1f1f; }
+
+  .random-ideas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .chip {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+    background: transparent;
+    white-space: nowrap;
+  }
+  .chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Actions */
+  .actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+
+  .btn {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: 1px solid var(--border2);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: transparent;
+    color: var(--text);
+  }
+  .btn:hover { background: var(--surface2); }
+  .btn:active { transform: scale(0.98); }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #0e0e0e;
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+  .btn-primary:hover { background: var(--accent-dim); border-color: var(--accent-dim); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+  /* Output */
+  .output { margin-top: 2.5rem; }
+
+  .loading {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 2rem 0;
+  }
+
+  .dots { display: flex; gap: 5px; }
+  .dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: blink 1.2s ease-in-out infinite;
+  }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100% { opacity: 0.2; } 40% { opacity: 1; } }
+
+  .script-wrap {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    animation: fadeUp 0.4s ease;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .script-meta {
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--surface);
+  }
+
+  .script-ep {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+  }
+
+  .script-badges { display: flex; gap: 6px; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .script-content {
+    padding: 24px 24px 20px;
+    background: var(--surface);
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .s-role {
+    display: block;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 18px;
+    margin-bottom: 3px;
+  }
+  .s-role:first-child { margin-top: 0; }
+
+  .s-line { display: block; color: var(--text); }
+
+  .s-direction {
+    display: block;
+    font-style: italic;
+    color: var(--hint);
+    font-size: 13px;
+    margin: 6px 0;
+  }
+
+  .s-punchline {
+    display: block;
+    color: var(--accent);
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 14px;
+  }
+
+  .s-tagline {
+    display: block;
+    color: var(--hint);
+    font-size: 12px;
+    margin-top: 16px;
+    font-style: italic;
+  }
+
+  .script-actions {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    gap: 8px;
+  }
+
+  .btn-sm {
+    font-size: 12px;
+    padding: 6px 14px;
+    font-family: var(--mono);
+  }
+
+  .error-msg {
+    color: var(--danger);
+    font-family: var(--mono);
+    font-size: 13px;
+    padding: 1.5rem 0;
+    border-top: 1px solid var(--border);
+    margin-top: 1.5rem;
+  }
+
+  /* History */
+  .history { margin-top: 3rem; }
+  .history-label {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--hint);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+  }
+
+  .history-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .history-item:hover .h-title { color: var(--accent); }
+
+  .h-title {
+    font-family: var(--mono);
+    font-size: 13px;
+    color: var(--muted);
+    transition: color 0.15s;
+  }
+
+  .h-preview {
+    font-size: 13px;
+    color: var(--hint);
+    margin-top: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  @media (max-width: 560px) {
+    .grid-2 { grid-template-columns: 1fr; }
+    .layout { padding: 2rem 1.25rem 5rem; }
+    .top-bar { flex-direction: column; gap: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <div class="top-bar">
+    <div class="wordmark">
+      <strong>Supply Chain Moments</strong>
+      Scriptgenerator — Inact
+    </div>
+    <div class="ep-count" id="epCount">Episode #—</div>
+  </div>
+
+  <!-- API Key -->
+  <div class="api-section">
+    <label>API-NØGLE</label>
+    <input type="password" id="apiKey" placeholder="sk-ant-api03-..." oninput="checkKey()" />
+    <div class="api-dot" id="apiDot"></div>
+  </div>
+
+  <!-- Situation -->
+  <div class="situation-wrap">
+    <label class="form-label">Situation</label>
+    <textarea id="situation" placeholder="Fx: Salg lover kunden levering i morgen. Supply chain finder ud af, at varen slet ikke er bestilt endnu."></textarea>
+    <div class="random-ideas">
+      <button class="chip" onclick="useSituation(0)">MOQ-problem</button>
+      <button class="chip" onclick="useSituation(1)">Forecast ændret 4 gange</button>
+      <button class="chip" onclick="useSituation(2)">Ingen backup-leverandør</button>
+      <button class="chip" onclick="useSituation(3)">S&OP — hvem ejer det?</button>
+      <button class="chip" onclick="useSituation(4)">Lager vs. system</button>
+      <button class="chip" onclick="useSituation(5)">12 nye varianter lanceres</button>
+    </div>
+  </div>
+
+  <!-- Options -->
+  <div class="grid-2">
+    <div class="field">
+      <label class="form-label">Hook-type</label>
+      <select id="hooktype">
+        <option value="auto">Automatisk</option>
+        <option value="curiosity">Curiosity Gap</option>
+        <option value="problem">Problem-løsning</option>
+        <option value="emotion">Emotion</option>
+        <option value="reframe">Reframe</option>
+        <option value="negativity">Negativity</option>
+      </select>
+    </div>
+    <div class="field">
+      <label class="form-label">Scriptmodel</label>
+      <select id="scriptmodel">
+        <option value="auto">Automatisk</option>
+        <option value="stp">Setup, Twist, Payoff</option>
+        <option value="pas">PAS</option>
+        <option value="aida">AIDA</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="field" style="margin-bottom:1.5rem;">
+    <label class="form-label">Roller (valgfrit)</label>
+    <input type="text" id="roles" placeholder="Fx: Salg, Indkøb, Lagerchef" />
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" id="genBtn" onclick="generate()">Generér script</button>
+    <button class="btn" onclick="randomSituation()">Tilfældig</button>
+  </div>
+
+  <div id="output"></div>
+  <div id="history" class="history"></div>
+
+</div>
+
+<script>
+const situations = [
+  "Vi har bestilt 300 enheder hjem af en vare vi kun sælger 30 af om året. Indkøb forklarer det til økonomi.",
+  "Forecastet er blevet opdateret for fjerde gang på én uge. Produktionsplanen er allerede sat.",
+  "Leverandøren melder force majeure. Ingen har en backup-leverandør.",
+  "Møde om at indføre S&OP. Ingen er enige om, hvem der ejer processen.",
+  "Systemet siger 120 på lager. Det fysiske lager har 37. Lagerchef kalder det en timing-difference.",
+  "Direktøren vil reducere kompleksiteten. Salg lancerer 12 nye varianter samme dag.",
+];
+
+const hookLabels = { auto:'Automatisk', curiosity:'Curiosity Gap', problem:'Problem-løsning', emotion:'Emotion', reframe:'Reframe', negativity:'Negativity' };
+const modelLabels = { auto:'Automatisk', stp:'Setup, Twist, Payoff', pas:'PAS', aida:'AIDA' };
+
+let epNumber = Math.floor(Math.random() * 50) + 28;
+let scriptHistory = [];
+
+document.getElementById('epCount').textContent = `Episode #${epNumber}`;
+
+function checkKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  document.getElementById('apiDot').className = 'api-dot' + (key.startsWith('sk-ant') ? ' ok' : '');
+}
+
+function useSituation(i) {
+  document.getElementById('situation').value = situations[i];
+}
+
+function randomSituation() {
+  const i = Math.floor(Math.random() * situations.length);
+  document.getElementById('situation').value = situations[i];
+}
+
+async function generate() {
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const situation = document.getElementById('situation').value.trim();
+
+  if (!apiKey) { showError('Indtast din Anthropic API-nøgle øverst.'); return; }
+  if (!apiKey.startsWith('sk-ant')) { showError('API-nøglen ser forkert ud. Den skal starte med sk-ant...'); return; }
+  if (!situation) { showError('Beskriv en situation først.'); return; }
+
+  const hook = document.getElementById('hooktype').value;
+  const model = document.getElementById('scriptmodel').value;
+  const roles = document.getElementById('roles').value.trim();
+
+  document.getElementById('genBtn').disabled = true;
+  document.getElementById('output').innerHTML = `<div class="loading"><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><span>Genererer script...</span></div>`;
+
+  const systemPrompt = `Du er scriptforfatter for "Supply Chain Moments" — en LinkedIn-videoserie i stil med The Office, men i supply chain-universet.
+
+EKSEMPLER PÅ SCRIPTS (brug som stilguide):
+
+Supply Chain Moments #4 - Forecast
+SALES: "Forecastet er ret præcist."
+SUPPLY CHAIN: "Hvor præcist?"
+SALES: "Vi ramte én måned sidste år."
+Pause.
+Supply chain kigger i kameraet.
+TEKSTSKÆRM: Forecast er præcist. Bare ikke på tidspunkt eller volumen.
+
+Supply Chain Moments #9 - Data-diskussionen
+PERSON 1: "Systemet siger 120 på lager."
+PERSON 2: "Excel siger 95."
+PERSON 3: "Lageret siger 40."
+Pause.
+TEKSTSKÆRM: Hvilket tal vil I styre efter?
+
+Supply Chain Moments #14 - Servicegrad
+DIREKTØR: "Vi skal op på 98 % servicegrad på alle varer."
+ØKONOMI: "Og reducere lageret."
+Supply chain kigger ind i kameraet.
+TEKSTSKÆRM: Hvad vil I optimere først?
+
+Supply Chain Moments #27 - Den nye KPI
+DIREKTØR: "Fra nu af måler vi på OTIF."
+SUPPLY CHAIN: "Hvem ejer den KPI?"
+DIREKTØR: "Det gør... alle."
+Pause.
+TEKSTSKÆRM: En KPI alle ejer, ejer ingen.
+
+FORMAT:
+- Start direkte — ingen introduktion
+- 2-3 roller, korte replikker
+- Overdrevet reaktion eller misforståelse
+- Kig-i-kameraet-moment hvis det passer
+- Punchline som tekstskærm
+- Slut med: Supply Chain Moments – Små øjeblikke fra den virkelige supply chain-hverdag.
+
+HOOK-TYPE: ${hookLabels[hook]}
+SCRIPTMODEL: ${modelLabels[model]}
+${roles ? 'ROLLER: ' + roles : ''}
+
+Returner KUN scriptet i dette format — ingen forklaringer før eller efter:
+
+TITEL: [kort titel]
+---
+[ROLLENAVN]:
+"[replik]"
+
+[kursiv instruktion hvis relevant]
+
+TEKSTSKÆRM:
+[Kort, skarp sætning]
+
+Supply Chain Moments – Små øjeblikke fra den virkelige supply chain-hverdag.`;
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-calls': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: `Situation: ${situation}` }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '';
+    if (!text) throw new Error('Tomt svar fra API');
+
+    renderScript(text, hook, model);
+    epNumber++;
+    document.getElementById('epCount').textContent = `Episode #${epNumber}`;
+
+  } catch(e) {
+    showError(`Fejl: ${e.message}`);
+  } finally {
+    document.getElementById('genBtn').disabled = false;
+  }
+}
+
+function renderScript(raw, hook, model) {
+  const lines = raw.split('\n');
+  let title = '';
+  let bodyLines = [];
+  let inBody = false;
+
+  for (const line of lines) {
+    if (line.startsWith('TITEL:')) title = line.replace('TITEL:', '').trim();
+    else if (line.trim() === '---') inBody = true;
+    else if (inBody) bodyLines.push(line);
+  }
+
+  if (!inBody) bodyLines = lines;
+
+  const bodyHtml = bodyLines.map(line => {
+    const t = line.trim();
+    if (!t) return '<span style="display:block;height:8px;"></span>';
+    if (/^[A-ZÆØÅ][A-ZÆØÅ\s\-]+:$/.test(t)) return `<span class="s-role">${t}</span>`;
+    if (t.startsWith('TEKSTSKÆRM:')) return `<span class="s-punchline">${t.replace('TEKSTSKÆRM:', '').trim()}</span>`;
+    if (t.toLowerCase().startsWith('supply chain moments –') || t.toLowerCase().startsWith('supply chain moments -')) return `<span class="s-tagline">${t}</span>`;
+    if (t.startsWith('*') || (t.startsWith('[') && t.endsWith(']'))) return `<span class="s-direction">${t.replace(/\*/g,'').replace(/[\[\]]/g,'')}</span>`;
+    if (/^(Pause|Klip)\.*$/.test(t)) return `<span class="s-direction">${t}</span>`;
+    if (t.toLowerCase().includes('kigger') || t.toLowerCase().includes('klip til')) return `<span class="s-direction">${t}</span>`;
+    return `<span class="s-line">${t}</span>`;
+  }).join('');
+
+  const ep = epNumber;
+  const fullTitle = title ? `#${ep} — ${title}` : `#${ep}`;
+
+  const scriptObj = { ep, title, raw, bodyHtml, hook, model };
+  scriptHistory.unshift(scriptObj);
+
+  document.getElementById('output').innerHTML = `
+    <div class="script-wrap">
+      <div class="script-meta">
+        <span class="script-ep">SCM ${fullTitle}</span>
+        <div class="script-badges">
+          <span class="badge">${hookLabels[hook]}</span>
+          <span class="badge">${modelLabels[model]}</span>
+        </div>
+      </div>
+      <div class="script-content" id="scriptContent">${bodyHtml}</div>
+      <div class="script-actions">
+        <button class="btn btn-sm" onclick="copyScript()">Kopiér</button>
+        <button class="btn btn-sm" onclick="generate()">Generér nyt</button>
+      </div>
+    </div>`;
+
+  renderHistory();
+}
+
+function copyScript() {
+  const el = document.getElementById('scriptContent');
+  if (el) navigator.clipboard.writeText(el.innerText).then(() => {
+    const btn = document.querySelector('.script-actions .btn');
+    const orig = btn.textContent;
+    btn.textContent = 'Kopieret ✓';
+    setTimeout(() => btn.textContent = orig, 2000);
+  });
+}
+
+function showError(msg) {
+  document.getElementById('output').innerHTML = `<div class="error-msg">${msg}</div>`;
+  document.getElementById('genBtn').disabled = false;
+}
+
+function renderHistory() {
+  if (scriptHistory.length < 2) return;
+  const h = document.getElementById('history');
+  h.innerHTML = `<div class="history-label">Tidligere scripts</div>` +
+    scriptHistory.slice(1).map((s, i) => `
+      <div class="history-item" onclick="showHistorical(${i+1})">
+        <div class="h-title">SCM #${s.ep}${s.title ? ' — ' + s.title : ''}</div>
+        <div class="h-preview">${s.raw.split('\n').find(l => l.includes('"')) || ''}</div>
+      </div>`).join('');
+}
+
+function showHistorical(i) {
+  const s = scriptHistory[i];
+  const fullTitle = s.title ? `#${s.ep} — ${s.title}` : `#${s.ep}`;
+  document.getElementById('output').innerHTML = `
+    <div class="script-wrap">
+      <div class="script-meta">
+        <span class="script-ep">SCM ${fullTitle}</span>
+        <div class="script-badges">
+          <span class="badge">${hookLabels[s.hook]}</span>
+          <span class="badge">${modelLabels[s.model]}</span>
+        </div>
+      </div>
+      <div class="script-content" id="scriptContent">${s.bodyHtml}</div>
+      <div class="script-actions">
+        <button class="btn btn-sm" onclick="copyScript()">Kopiér</button>
+      </div>
+    </div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
